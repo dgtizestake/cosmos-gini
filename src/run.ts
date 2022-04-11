@@ -22,7 +22,7 @@ const giniByHeight = async (rpc: string, height: number): Promise<number> => {
   const sorted = votingPowers.map(n => Number(n)).sort((a, b) => a - b);
   const sum = sorted.reduce((a, b) => a + b, 0);
 
-  // Formula taken from http://kimberlyfessel.com/mathematics/applications/gini-use-cases/ for strictly positive values
+  // Formula taken from http://kimberlyfessel.com/mathematics/applications/gini-use-cases/#gini-in-python for strictly positive values
   const numerator = sorted.reduce((a, b, i) => a + b * (2 * i - sorted.length - 1), 0);
   const denominator = sorted.length * sum;
 
