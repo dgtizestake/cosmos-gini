@@ -16,10 +16,10 @@ const giniByHeight = async (rpc: string, height: number): Promise<number> => {
     data: {
       result: { validators },
     },
-  } = await axios.get<ValidatorResponse>(`${rpc}validators?height=${height}&per_page=200`); // Hacky circumvention of pagination
-  const votingPowers = validators.map(validator => validator.voting_power);
+  } = await axios.get<ValidatorResponse>(`${rpc}/validators?height=${height}&per_page=200`); // Hacky circumvention of pagination
+  const votingPowers = validators.map(validator => Number(validator.voting_power));
 
-  const sorted = votingPowers.map(n => Number(n)).sort((a, b) => a - b);
+  const sorted = votingPowers.sort((a, b) => a - b);
   const sum = sorted.reduce((a, b) => a + b, 0);
 
   // Formula taken from http://kimberlyfessel.com/mathematics/applications/gini-use-cases/#gini-in-python for strictly positive values
