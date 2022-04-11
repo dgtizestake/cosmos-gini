@@ -27,7 +27,7 @@ const giniByHeight = async (rpc: string, height: number): Promise<number> => {
   const denominator = sorted.length * sum;
 
   const coefficient = numerator / denominator;
-  console.log(`Computed Gini coefficient of ${coefficient} for height ${height}`);
+  console.log(`${coefficient} Gini coefficient for block ${height}`);
   return coefficient;
 };
 
@@ -59,22 +59,26 @@ yargs(hideBin(process.argv))
             type: 'number',
             demandOption: true,
           },
+          step: {
+            describe: 'The number of blocks to increase per iteration',
+            type: 'number',
+            default: 500,
+          },
         })
         .check(argv => {
           if (argv.startHeight >= argv.endHeight) throw 'Start height must be less than end height';
           return true;
         }),
     async argv => {
-      const { rpc, concurrency, startHeight, endHeight } = argv;
+      const { rpc, concurrency, startHeight, endHeight, step } = argv;
       const limit = pLimit(concurrency);
 
-      const pool = [...Array(endHeight - startHeight)].map((_, i) => limit(() => giniByHeight(rpc, startHeight + i)));
+      const iterations = Math.ceil((endHeight - startHeight) / step);
+      const pool = [...Array(iterations)].map((_, i) => limit(() => giniByHeight(rpc, startHeight + i * step)));
       const coefficients = await Promise.all(pool);
 
       const avg = coefficients.reduce((a, b) => a + b) / coefficients.length;
-      console.log(
-        `${avg.toFixed(4)} avg. Gini coefficient for ${coefficients.length} blocks (${startHeight}-${endHeight})`
-      );
+      console.log(`${avg.toFixed(4)} avg. Gini coefficient between blocks ${startHeight}-${endHeight}`);
     }
   )
   .help().argv;
