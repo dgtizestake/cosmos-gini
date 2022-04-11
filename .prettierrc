@@ -1,0 +1,6 @@
+{
+  "singleQuote": true,
+  "trailingComas": false,
+  "arrowParens": "avoid",
+  "printWidth": 120
+}
